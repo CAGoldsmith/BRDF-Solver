@@ -1,0 +1,63 @@
+function I_leg = findIMatrixGiga(robot,comPoints)
+keyboard
+numLegs = robot.numLegs;
+for i=1:numLegs %For each leg...
+    numBodies = robot.legObj{i}.numBodies-2;
+    segM = robot.legObj{i}.mass(2:end-1);
+    segW = 0.015;
+    segH = 0.015;
+    segL = robot.legObj{1}.lengths(2:end-1);
+
+    %% Compute the moments/products of inertia for each segment
+    %THC BRIDGE 1
+    I_ThCBridge1(1,1) = 1/12 * segM(1) * (.01^2 + .01^2); %Ixx
+    I_ThCBridge1(2,2) = 1/12 * segM(1) * (.001^2 + .01^2); %Iyy
+    I_ThCBridge1(3,3) = 1/12 * segM(1) * (.01^2 + .001^2); %Izz
+
+    %THC BRIDGE 2
+    I_ThCBridge2(1,1) = 1/12 * segM(2) * (.01^2 + .01^2); %Ixx
+    I_ThCBridge2(2,2) = 1/12 * segM(2) * (.001^2 + .01^2); %Iyy
+    I_ThCBridge2(3,3) = 1/12 * segM(2) * (.01^2 + .001^2); %Izz
+
+    %COXA:
+    %Moments of inertia
+        I_coxa(1,1) = 1/12 * segM(3) * (segW^2 + segH^2);
+        I_coxa(2,2) = 1/12 * segM(3) * (segW^2 + segL(3)^2);
+        I_coxa(3,3) = 1/12 * plasM(3) * (segH^2 + segL(3)^2);
+    %Then, the products of inertia
+    %All products of inertia for the coxa are zero, because the only deviation
+    %is in x
+
+     %TROCHANTER:
+    %Moments of inertia:
+    I_troc(1,1) = 1/12 * segM(4) * (segW^2 + segH^2);
+    I_troc(2,2) = 1/12 * segM(4) * (segW^2 + segL(4)^2);
+    I_troc(3,3) = 1/12 * segM(4) * (segL(4)^2 + segH^2);
+    %Product of inertia:
+    %All products of inertia for the trochanter are zero
+
+    %FEMUR
+    %Moments of inertia:
+    I_fem(1,1) = 1/12 * segM(5) * (segW^2 + segH^2);
+    I_fem(2,2) = 1/12 * segM(5) * (segW^2 + segL(5)^2);
+    I_fem(3,3) = 1/12 * segM(5) * (segL(5)^2 + segH^2);
+    %Products of inertia should be zero, as the z coord of the CoM
+    %doesn't leave the x-axis for any of the portions of the segment
+
+    %TIBIA
+    %Moments of Inertia:
+    I_tib(1,1) = 1/12 * segM(6) * (segW^2 + segH^2);
+    I_tib(2,2) = 1/12 * segM(6) * (segL(6)^2 + segW^2);
+    I_tib(3,3) = 1/12 * segM(6) * (segL(6)^2 + segH^2);
+
+    %Products of inertia: All are zero
+
+    %TARSUS
+    %Moments of inertia:
+    I_tar(1,1) = 1/12 * segM(7) * (segW^2 + segH^2);
+    I_tar(2,2) = 1/12 * segM(7) * (segL(7)^2 + segW^2);
+    I_tar(3,3) = 1/12 * segM(7) * (segL(7)^2 +segH^2);
+    %Products of inertia: All are zero
+
+    I_leg{i} = {I_ThCBridge1; I_ThCBridge2; I_coxa; I_troc; I_fem; I_tib; I_tar};
+end

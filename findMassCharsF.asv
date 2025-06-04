@@ -1,0 +1,213 @@
+function [I, segM] = findMassCharsF()
+
+%Clarissa Goldsmith
+%West Virginia University
+
+%This script runs independently of the rest of design_drosophibot, with the
+%intent that you find the CoMs and overall masses with the script, then plug in the
+%results in the Animatlab file
+
+%% ASSUMPTIONS/DEFINITIONS
+%Current leg design for the middle/hind has the coxa as all actuator, the trochanter as all
+%plastic, the femur as two actuators with plastic, and the tibia and tarsus
+%as all plastic
+
+%Current leg design also uses MX-28 actuators with the following
+%parameters:
+actuator.mass = 82.7/1000; %kg - MX-28T
+actuator.length = 50.6/1000; %m
+actuator.width = 35.5/1000; %m
+actuator.height = 35.6/1000; %m
+actuator.hornWidth = 40/1000; %m
+actuator.hornCOMLength = 16.1/1000; %m
+
+%Segment lengths are:
+segL = [30; 50; 24; 80; 80; 80]/1000; %m
+plasL = [3.97; 17.4; 24; 21.2; 80; 80]/1000; %m
+
+%Other dimensions of the plastic are:
+%This takes the most "prevalent" dimension for each
+plasW = [37.7; 36.5; 50; 25.4; 25.4; 25.4]/1000;
+plasH = [38.1; 24.5; 23.8; 50.8; 25.4; 25.4]/1000;
+
+%Segment masses are:
+plasM = [4.6; 3.9; 6.4; 12.7; 23.6; 20.7]/1000; %kg
+segM = [actuator.mass+plasM(1); actuator.mass+plasM(2); plasM(3); actuator.mass*2 + plasM(4); plasM(5); plasM(6)]; %kg
+
+%% Find the CoM of each segment
+
+%The CoM of the plastic pieces, according to solidworks and assuming that
+%they have roughly uniform density
+%Measured from the location of the most proximal attachment point of the
+%segment
+plasCOM = [0.31, 0, 0;...
+    0.54, 0, 0;...
+    0.81, 0, 0;...
+    1.05, 1.27, 0;...
+    3.9, 0, 0;...
+    2.3, 0, 0]'/100;
+        
+%The CoM of each segment, with reference to the most proximal joint it
+%attaches to
+%ThC Bridge:
+x1 = actuator.hornWidth/2; y1 = actuator.hornCOMLength; 
+x2 = plasCOM(1,1);
+x3 = x2 + actuator.length/2; 
+x1_s = -(y1*cosd(38)+(x1+y1*tand(38)))*actuator.mass;
+y1_s = (x1+y1*tand(38))*cosd(38)*actuator.mass;
+x2_s = x2*sind(38)*plasM(1);
+y2_s = x2*cosd(38)*plasM(1);
+x3_s = x3*sind(38)*actuator.mass;
+y3_s = x3*cosd(38)*actuator.mass;
+COMjr(:,1) = [(x2_s + x3_s)/segM(1);...
+    (y2_s - y3_s)/segM(1);...
+    0];
+
+%Coxa:
+COMjr(:,2) = [(plasCOM(1,2)*plasM(2) + (plasCOM(1,2)+actuator.length/2)*actuator.mass)/segM(2);...
+    0; 0];
+
+%Trochanter:
+COMjr(:,3) = plasCOM(:,3);
+
+
+%Femur:
+COMjr(1,4) = (actuator.hornWidth/2*actuator.mass + (actuator.hornWidth + plasCOM(1,4))*plasM(4) +...
+    (actuator.hornWidth + plasL(4) + actuator.height/2)*actuator.mass)/segM(4);   
+
+COMjr(2,4) = (-actuator.length/2*actuator.mass + plasCOM(2,4)*plasM(4) + actuator.length/2*actuator.mass)/segM(4);
+
+COMjr(3,4) = 0;
+
+%Tibia:
+COMjr(:,5) = plasCOM(:,5);
+
+%Tarsus:
+COMjr(:,6) = plasCOM(:,6);
+
+%Convert these into CoMs based on the origin of each body in Animatlab
+for i=1:length(COMjr)
+    COMor(:,i) = COMjr(:,i) - [segL(i)/2; 0; 0];
+end
+
+%% Compute the moments of inertia for each segment
+%THC BRIDGE:
+%First, need to get the non-rotated moments and products
+I_bridgeNR(1,1) = 1/12 * plasM(1) * (plasW(1)^2 + plasH(1)^2) +... %I about CoM for plastic
+    1/12 * actuator.mass * (actuator.hornWidth^2 + actuator.height^2) +... %I about CoM for lateral actuator
+    actuator.I; %Contribution of actuator's internal I
+
+I_bridgeNR(2,2) = 1/12 * plasM(1) * (plasL(1)^2 + plasW(1)^2) +... %I about CoM for plastic
+    plasM(1) * abs(plasCOM(1,1))^2 +... %parallel axis thm for plastic
+    1/12 * actuator.mass * (actuator.length^2 + actuator.height^2) +... %I about CoM for lateral actuator
+    actuator.mass * abs(plasCOM(1,1)+actuator.length/2)^2 -... %parallel axis thm for lateral actuator
+    segM(1) * abs((plasM(1)*plasCOM(1,1)+actuator.mass*(plasCOM(1,1)+actuator.length/2))/segM(1))^2; %parallel axis thm for whole segment
+
+I_bridgeNR(3,3) = 1/12 * plasM(1) * (plasL(1)^2 + plasH(1)^2) +... %I about CoM for plastic
+    plasM(1) * abs(plasCOM(1,1))^2 +... %parallel axis thm for plastic
+    1/12 * actuator.mass * (actuator.length^2 + actuator.hornWidth^2) +... %I about CoM for lateral actuator
+    actuator.mass * abs(plasCOM(1,1)+actuator.length/2)^2 -... %parallel axis thm for lateral actuator
+    segM(1) * abs((plasM(1)*plasCOM(1,1)+actuator.mass*(plasCOM(1,1)+actuator.length/2))/segM(1))^2; %parallel axis thm for whole segment
+
+%Because the only deviation from the CoM is in the x direction, the non-rotated products will all be zero
+
+%Now, do the rotation, using code taken from oneLegInvKin.m
+w = [0;0;1];
+wHat = hat(w);
+v = [0;0;0];
+exp_w = @(theta,wHat) eye(3)+wHat*sind(theta)+wHat^2*(1-cosd(theta));
+g = @(theta,wHat,v) [exp_w(theta,wHat), (eye(3)-exp_w(theta,wHat))*wHat*v; 0 0 0 1];
+g_bridge = g(52,wHat,v);
+g_bridge = g_bridge(1:3,1:3);
+
+I_bridge = g_bridge*I_bridgeNR*g_; 
+
+
+%COXA:
+%Moments of inertia
+I_coxa(1,1) = 1/12 * plasM(2) * (plasW(2)^2 + plasH(2)^2) +... %I around CoM for plastic
+    1/12 * actuator.mass * (actuator.height^2 + actuator.hornWidth^2)+... %I around CoM for actuator
+    actuator.I; %Moment contribution from servo 
+%No parallel axis thm here because CoM in line with joint point for y and z
+%coords
+I_coxa(2,2) = 1/12 * plasM(2) * (plasW(2)^2 + plasL(2)^2) +... %I around CoM for plastic
+    plasM(2) * abs(plasCOM(1,2))^2 +... %Parallel axis thm for plastic
+    1/12 * actuator.mass * (actuator.length^2 + actuator.hornWidth^2) +... %I around CoM or actuator
+    actuator.mass * abs(plasCOM(1,2) + actuator.length/2)^2 -... %parallel axis thm for plastic
+    segM(2) * abs(COMjr(1,2))^2; %Parallel axis thm for whole segment   
+
+I_coxa(3,3) = 1/12 * plasM(2) * (plasH(2)^2 + plasL(2)^2) +... %I around CoM for plastic
+    plasM(2) * abs(plasCOM(1,2))^2 +... %Parallel axis thm for plastic
+    1/12 * actuator.mass * (actuator.height^2 + actuator.length^2) +... %I around CoM for actuator
+    actuator.mass * abs(plasCOM(1,2) + actuator.length/2)^2 -... %Parallel axis thm for actuator
+    segM(2) * abs(COMjr(1,2))^2; %Parallel axis thm for whole segment
+
+%Then, the products of inertia
+%All products of inertia for the coxa are zero, because the only deviation
+%is in x
+
+%TROCHANTER:
+%Moments of inertia:
+I_troc(1,1) = 1/12 * plasM(2) * (plasW(2)^2 + plasH(2)^2);
+I_troc(2,2) = 1/12 * plasM(2) * (plasW(2)^2 + plasL(2)^2);
+I_troc(3,3) = 1/12 * plasM(2) * (plasL(2)^2 + plasH(2)^2) + actuator.I;
+
+%Product of inertia:
+%All products of inertia for the trochanter are zero
+
+%FEMUR
+%This one is the bear
+%Moments of inertia:
+I_fem(1,1) = (1/12 * actuator.mass * (actuator.height^2 + actuator.length^2) +...
+    actuator.mass * norm([-actuator.length/2; 0])^2 +...
+    1/12 * plasM(3) * (plasW(3)^2 + plasH(3)^2) +...
+    plasM(3) * norm([plasCOM(2,3);0])^2 +...
+    1/12 * actuator.mass * (actuator.hornWidth^2 + actuator.length^2) +...
+    actuator.mass * norm([actuator.length/2; 0])^2) -...
+    (segM(3) * norm(COMjr(2:3,3))^2);
+
+I_fem(2,2) = (1/12 * actuator.mass * (actuator.hornWidth^2 + actuator.height^2) +...
+    actuator.mass * norm([actuator.hornWidth/2; 0])^2 +...
+    1/12 * plasM(3) * (plasW(3)^2 + plasL(3)^2)^2 +...
+    plasM(3) * norm([actuator.hornWidth + plasCOM(1,3); 0])^2 +...
+    1/12 * actuator.mass * (actuator.hornWidth^2 + actuator.height^2) +...
+    actuator.mass * norm([actuator.hornWidth + plasL(3) + actuator.height/2; 0])^2) -...
+    (segM(3)* norm([COMjr(1,3); COMjr(3,3)])^2);
+
+I_fem(3,3) = (1/12 * actuator.mass * (actuator.length^2 + actuator.hornWidth^2) +...
+    actuator.mass * norm([actuator.hornWidth/2; -actuator.length/2])^2 +...
+    1/12 * plasM(3) * (plasL(3)^2 + plasH(3)^2) +...
+    plasM(3) * norm([actuator.hornWidth + plasCOM(1,3); plasCOM(2,3)])^2 +...
+    1/12 * actuator.mass * (actuator.length^2 + actuator.height^2) +...
+    actuator.mass * norm([actuator.hornWidth + plasL(3) + actuator.height/2; actuator.length/2])^2) -...
+    segM(3) * norm(COMjr(1:2,3))^2;
+
+%Products of inertia:
+I_fem(2,1) = actuator.mass * -(segL(3)/2 - actuator.hornWidth/2) * -actuator.length/2 +...
+    segM(3) * (actuator.hornWidth + 2.04/100 - segL(3)/2) * plasCOM(2,3) +...
+    actuator.mass * (segL(3)/2 - actuator.hornWidth/2) * actuator.length/2;
+I_fem(1,2) = I_fem(2,1);
+
+%Other products of inertia should be zero, as the z coord of the CoM
+%doesn't leave the x-axis for any of the portions of the segment
+
+
+%TIBIA
+%Moments of Inertia:
+I_tib(1,1) = 1/12 * segM(4) * (plasW(4)^2 + plasH(4)^2);
+I_tib(2,2) = 1/12 * segM(4) * (plasL(4)^2 + plasW(4)^2);
+I_tib(3,3) = 1/12 * segM(4) * (plasL(4)^2 + plasH(4)^2);
+
+%Products of inertia: All are zero
+
+%TARSUS
+%Moments of inertia:
+I_tar(1,1) = 1/12 * segM(5) * (plasW(5)^2 + plasH(5)^2);
+I_tar(2,2) = 1/12 * segM(5) * (plasL(5)^2 + plasW(5)^2);
+I_tar(3,3) = 1/12 * segM(5) * (plasL(5)^2 + plasH(5)^2);
+
+%Products of inertia: All are zero
+
+I = {I_coxa; I_troc; I_fem; I_tib; I_tar};
+
+

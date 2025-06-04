@@ -1,0 +1,130 @@
+<deployment-project plugin="plugin.apptool" plugin-version="1.0">
+  <configuration build-checksum="76395675" file="G:\Other computers\NeuroMINT Lab Computer\MATLAB\Design Drosophibot\RunSolver.prj" location="G:\Other computers\NeuroMINT Lab Computer\MATLAB\Design Drosophibot" name="RunSolver" target="target.mlapps" target-name="Package App">
+    <param.appname>RunSolver</param.appname>
+    <param.authnamewatermark>Clarus Goldsmith</param.authnamewatermark>
+    <param.email>cg00022@mix.wvu.edu</param.email>
+    <param.company>West Virginia University</param.company>
+    <param.icon />
+    <param.icons />
+    <param.summary />
+    <param.description />
+    <param.screenshot>C:\Users\Clarus\AppData\Local\Temp\tp8ef7a81b_9265_42dc_a4dd_b7dc121d4032.png</param.screenshot>
+    <param.version>1.1</param.version>
+    <param.products.name>
+      <item>Communications Toolbox</item>
+      <item>Curve Fitting Toolbox</item>
+      <item>DSP System Toolbox</item>
+      <item>Deep Learning Toolbox</item>
+      <item>Econometrics Toolbox</item>
+      <item>Fixed-Point Designer</item>
+      <item>Image Processing Toolbox</item>
+      <item>Optimization Toolbox</item>
+      <item>Parallel Computing Toolbox</item>
+      <item>Robotics System Toolbox</item>
+      <item>Signal Processing Toolbox</item>
+      <item>Statistics and Machine Learning Toolbox</item>
+    </param.products.name>
+    <param.products.id>
+      <item>36</item>
+      <item>60</item>
+      <item>24</item>
+      <item>12</item>
+      <item>125</item>
+      <item>91</item>
+      <item>17</item>
+      <item>6</item>
+      <item>80</item>
+      <item>142</item>
+      <item>8</item>
+      <item>19</item>
+    </param.products.id>
+    <param.products.version>
+      <item>24.2</item>
+      <item>24.2</item>
+      <item>24.2</item>
+      <item>24.2</item>
+      <item>24.2</item>
+      <item>24.2</item>
+      <item>24.2</item>
+      <item>24.2</item>
+      <item>24.2</item>
+      <item>24.2</item>
+      <item>24.2</item>
+      <item>24.2</item>
+    </param.products.version>
+    <param.platforms />
+    <param.output>${PROJECT_ROOT}</param.output>
+    <param.guid>498cb1ba-35f4-4c6f-bd4d-1f84fdeb96e1</param.guid>
+    <unset>
+      <param.icon />
+      <param.icons />
+      <param.summary />
+      <param.description />
+      <param.platforms />
+      <param.output />
+    </unset>
+    <fileset.main>
+      <file>${PROJECT_ROOT}\RunSolver.mlapp</file>
+    </fileset.main>
+    <fileset.depfun>
+      <file>${PROJECT_ROOT}\calculateCEeq.m</file>
+      <file>${PROJECT_ROOT}\DefineJointLimits.mlapp</file>
+      <file>${PROJECT_ROOT}\DefineNewActuator.mlapp</file>
+      <file>${PROJECT_ROOT}\DefineNewConfig.mlapp</file>
+      <file>${PROJECT_ROOT}\definePlasticPropsDroso2.m</file>
+      <file>${PROJECT_ROOT}\definePlasticPropsTypHex.m</file>
+      <file>${PROJECT_ROOT}\descCommNetwork.m</file>
+      <file>${PROJECT_ROOT}\design_drosophibot.m</file>
+      <file>${PROJECT_ROOT}\findIMatrix.m</file>
+      <file>${PROJECT_ROOT}\findIMatrixGeneric.m</file>
+      <file>${PROJECT_ROOT}\findIMatrixGiga.m</file>
+      <file>${PROJECT_ROOT}\findIMatrixTypHex.m</file>
+      <file>${PROJECT_ROOT}\footCond.m</file>
+      <file>${PROJECT_ROOT}\hat.m</file>
+      <file>${PROJECT_ROOT}\joint.m</file>
+      <file>${PROJECT_ROOT}\kinematicOrganism.m</file>
+      <file>${PROJECT_ROOT}\leg.m</file>
+      <file>${PROJECT_ROOT}\legHeightCon.m</file>
+    </fileset.depfun>
+    <fileset.resources>
+      <file>${PROJECT_ROOT}\variables</file>
+    </fileset.resources>
+    <fileset.package />
+    <build-deliverables>
+      <file location="G:\Other computers\NeuroMINT Lab Computer\MATLAB" name="Design Drosophibot" optional="false">G:\Other computers\NeuroMINT Lab Computer\MATLAB\Design Drosophibot</file>
+    </build-deliverables>
+    <workflow />
+    <matlab>
+      <root>C:\Program Files\MATLAB\R2024b</root>
+      <toolboxes>
+        <toolbox name="fixedpoint" />
+        <toolbox name="neuralnetwork" />
+      </toolboxes>
+      <toolbox>
+        <fixedpoint>
+          <enabled>true</enabled>
+        </fixedpoint>
+      </toolbox>
+      <toolbox>
+        <neuralnetwork>
+          <enabled>true</enabled>
+        </neuralnetwork>
+      </toolbox>
+    </matlab>
+    <platform>
+      <unix>false</unix>
+      <mac>false</mac>
+      <windows>true</windows>
+      <win2k>false</win2k>
+      <winxp>false</winxp>
+      <vista>false</vista>
+      <linux>false</linux>
+      <solaris>false</solaris>
+      <osver>10.0</osver>
+      <os32>false</os32>
+      <os64>true</os64>
+      <arch>win64</arch>
+      <matlab>true</matlab>
+    </platform>
+  </configuration>
+</deployment-project>

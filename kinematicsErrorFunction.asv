@@ -1,0 +1,3 @@
+function error = kinematicsErrorFunction(thetas,prevConfig,currentFootPos, prevFootPos)
+error = (thetas-prevConfig)/(currentFootPos);
+end
