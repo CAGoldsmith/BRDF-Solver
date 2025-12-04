@@ -2625,6 +2625,9 @@ classdef leg < matlab.mixin.SetGet
 
             footPathSwNew5th = [x5_Sw;y5_Sw;z5_Sw];
 
+            %REMOVE AFTER GOTTEN PERTURBATION DATA
+            % stanceVec(3,11:31) = -0.01;
+
             footPathStFNew = stanceVec(:,(ceil(length(stanceVec)/2)):end);
             footPathStBNew = stanceVec(:,1:floor(length(stanceVec)/2));
 

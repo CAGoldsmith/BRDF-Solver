@@ -1,6 +1,7 @@
 function [] = design_drosophibot(savePathBase,configName,saveName,swingDuration,stanceDuty,stepHeight,floorLevel,springK,maxJointVelocity,bodyTranslation,bodyRotation,IMatrixFunName,actuatorName,terrainShape,contralateralPhase,ipsalateralPhase,runNeuralParams)
 load([savePathBase '\variables\configs\' configName ' Config.mat'])
 %%
+
 mirrored = [];
 % swingDuration = 0.5; %s
 maxStanceDuration = 6; %s
@@ -347,6 +348,8 @@ for tran=transVec
                 end
             end
         end
+        keyboard %For perturbation tests
+
         %Calculate the the omegas for each joint and velocities of each
         %body by averaging over the previous and future timesteps
         for n=timeVector
