@@ -102,7 +102,7 @@ if contains(terrainShape,'Ball')
 else
     ballParams = [];
 end
-[anglesRest,footPointsRest] = robot.findRestingPosture(jointVecs,floorLevel,boundingFactor,postureScaleFactor,terrainShape,ballParams);
+[anglesRest,footPointsRest] = robot.findRestingPosture(configName, jointVecs,floorLevel,boundingFactor,postureScaleFactor,terrainShape,ballParams);
 robot.setLowLevelParams();
 % configMat = cell2mat(configs);
 

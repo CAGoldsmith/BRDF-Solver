@@ -240,7 +240,7 @@ classdef kinematicOrganism < matlab.mixin.SetGet
             success = 1;
         end
         
-        function [configs,footPoints] = findRestingPosture(obj,jointVecs,standingHeight,boundingFactor,postureScaleFactor,terrainShape,ballParams)
+        function [configs,footPoints] = findRestingPosture(obj,configName,jointVecs,standingHeight,boundingFactor,postureScaleFactor,terrainShape,ballParams)
             configs = cell(1,obj.numLegs);
 
             % FOR THIS CODE: Run the flat plane stuff first, then if necessary solve for
@@ -277,7 +277,7 @@ classdef kinematicOrganism < matlab.mixin.SetGet
                 %the proper height. We transform x into theta, and plug it
                 %into the legHeightCon function.
                 %legHeightCon is a separate file.
-                fHeightCon = @(x) legHeightCon(Ainv*(x - b),leg,jointVec,standingHeight(i),postureScaleFactor,terrainShape);
+                fHeightCon = @(x) legHeightCon(Ainv*(x - b),leg,jointVec,standingHeight(i),postureScaleFactor,terrainShape,configName);
 
                 Aeqcon = [];
                 beqcon = [];
