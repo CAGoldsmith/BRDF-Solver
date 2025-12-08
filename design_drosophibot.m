@@ -308,12 +308,11 @@ for tran=transVec
             end
 
             if rem(n,stepSize) == 1 %Create plots of the side profile and overhead profile at this timestep, to be stitched together in a gif
-                for fp = 1:numLegs
-                    allFootPoints(:,fp) = footPointsRest{fp}';
+                if contains(configName,'Droso')
+                    ylim([min(allFootPoints(3,:))*1.25 max(allFootPoints(3,:))*1.25])
+                    zlim([min(floorLevel)*1.1 abs(min(floorLevel))/2])
+                    xlim([min(allFootPoints(1,:))*1.5 max(allFootPoints(1,:))*1.5])
                 end
-                ylim([min(allFootPoints(3,:))*1.25 max(allFootPoints(3,:))*1.25])
-                zlim([min(floorLevel)*1.1 abs(min(floorLevel))/2])
-                xlim([min(allFootPoints(1,:))*1.5 max(allFootPoints(1,:))*1.5])
                 hold on
                 plot3(CoMCoord(1,n),-CoMCoord(3,n),CoMCoord(2,n),'diamond')
                 if contains(terrainShape,'Ball')
@@ -700,12 +699,22 @@ for tran=transVec
                 else
                     legend('TiTar','FTi','TrF','CTr','ThC3','ThC1')
                 end
-            elseif contains(configName, 'Giga')
-                legend('TiTar','FTi','TrF','CTr','ThC3', 'ThC1', 'ThC2')
-            elseif contains(configName, 'Hex')
-                legend('TiTar','FTi','CTr','ThC')
             else
-                legend('TiTar','FTi','TrF','CTr','ThC3','ThC1','ThC2')
+                if contains(configName, 'Scale') || contains(configName, 'Giga')
+                    legend('TiTar','FTi','TrF','CTr','ThC3', 'ThC1', 'ThC2')
+                elseif contains(configName, 'Hex')
+                    legend('TiTar','FTi','CTr','ThC')
+                else
+                    genericJointNames = {};
+                    for jn = 1:numLegs
+                        jointsPerLeg(jn) = length(jointVecs{jn});
+                    end
+                    maxJointsPerLeg = max(jointsPerLeg);
+                    for jn = 1:maxJointsPerLeg
+                        genericJointNames{jn} = ['Joint ' num2str(maxJointsPerLeg - (jn-1))];
+                    end
+                    legend(genericJointNames)
+                end
             end
             saveas(tfig{i},[savePathDir '\' legNames{i} '_Torques']);
 
