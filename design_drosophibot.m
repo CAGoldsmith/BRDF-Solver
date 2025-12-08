@@ -310,9 +310,13 @@ for tran=transVec
 
             if rem(n,stepSize) == 1 %Create plots of the side profile and overhead profile at this timestep, to be stitched together in a gif
                 if contains(configName,'Droso')
-                    ylim([min(allFootPoints(3,:))*1.25 max(allFootPoints(3,:))*1.25])
+                    ylim([footPointsRest{3}(3)*1.25 footPointsRest{4}(3)*1.25])
                     zlim([min(floorLevel)*1.1 abs(min(floorLevel))/2])
-                    xlim([min(allFootPoints(1,:))*1.5 max(allFootPoints(1,:))*1.5])
+                    xlim([footPointsRest{1}(1)*1.5 footPointsRest{5}(1)*1.5])
+                elseif contains(configName,'Stick')
+                    ylim([-.25 .25])
+                    zlim([-.1 .1])
+                    xlim([-.15 .4])
                 end
                 hold on
                 plot3(CoMCoord(1,n),-CoMCoord(3,n),CoMCoord(2,n),'diamond')
