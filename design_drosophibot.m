@@ -308,9 +308,12 @@ for tran=transVec
             end
 
             if rem(n,stepSize) == 1 %Create plots of the side profile and overhead profile at this timestep, to be stitched together in a gif
-                ylim([footPointsRest{3}(3)*1.25 footPointsRest{4}(3)*1.25])
+                for fp = 1:numLegs
+                    allFootPoints(:,fp) = footPointsRest{fp}';
+                end
+                ylim([min(allFootPoints(3,:))*1.25 max(allFootPoints(3,:))*1.25])
                 zlim([min(floorLevel)*1.1 abs(min(floorLevel))/2])
-                xlim([footPointsRest{1}(1,1)*1.5 footPointsRest{numLegs}(1,1)*1.5])
+                xlim([min(allFootPoints(1,:))*1.5 max(allFootPoints(1,:))*1.5])
                 hold on
                 plot3(CoMCoord(1,n),-CoMCoord(3,n),CoMCoord(2,n),'diamond')
                 if contains(terrainShape,'Ball')
@@ -348,7 +351,6 @@ for tran=transVec
                 end
             end
         end
-        keyboard %For perturbation tests
 
         %Calculate the the omegas for each joint and velocities of each
         %body by averaging over the previous and future timesteps
