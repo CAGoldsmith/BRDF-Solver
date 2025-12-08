@@ -205,15 +205,16 @@ for tran=transVec
         %Shift the legs an appropriate amount to create the desired gait,
         %as determined by ispalateralPhase and contralateralPhase
 
-        %Leg 1 (LH) will always be considered at phase 0
+        %Leg 1 will always be considered at phase 0
         for L=1:numLegs
             if L == 1
                 phaseAmnt(L) = 0;
+                phaseSign = sign(footPointsRest{L}(3));
             else
-                if ~rem(L,2)
-                    phaseAmnt(L) = phaseAmnt(L-1) + contralateralPhase;
-                else
+                if sign(footPointsRest{L}(3)) == phaseSign
                     phaseAmnt(L) = phaseAmnt(L-2) + ipsalateralPhase;
+                else
+                    phaseAmnt(L) = phaseAmnt(L-1) + contralateralPhase;
                 end
             end
             if phaseAmnt(L) > 1
@@ -323,8 +324,8 @@ for tran=transVec
                     surf(sphereX+ballParams.center(1),-(sphereZ+ballParams.center(3)),sphereY+ballParams.center(2));
                 end
                 F1(nn) = getframe(figHandle1);
-                view(0,90)
-                plot3([footPoint{n}{2}(1) footPoint{n}{3}(1),footPoint{n}{6}(1) footPoint{n}{2}(1)],[-footPoint{n}{2}(3) -footPoint{n}{3}(3),-footPoint{n}{6}(3) -footPoint{n}{2}(3)],[footPoint{n}{2}(2) footPoint{n}{3}(2),footPoint{n}{6}(2) footPoint{n}{2}(2)],'-o')
+                view(0,90);
+                % plot3([footPoint{n}{2}(1) footPoint{n}{3}(1),footPoint{n}{6}(1) footPoint{n}{2}(1)],[-footPoint{n}{2}(3) -footPoint{n}{3}(3),-footPoint{n}{6}(3) -footPoint{n}{2}(3)],[footPoint{n}{2}(2) footPoint{n}{3}(2),footPoint{n}{6}(2) footPoint{n}{2}(2)],'-o')
                 F2(nn) = getframe(figHandle1);
                 if ~exist([savePathDir '\Walking Frames'])
                     mkdir([savePathDir '\Walking Frames'])
